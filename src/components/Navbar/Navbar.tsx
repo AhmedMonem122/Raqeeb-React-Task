@@ -15,7 +15,7 @@ const Navbar = ({ theme, setTheme }: NavbarProps) => {
   return (
     <nav className="navbar justify-between bg-base-100">
       <div className="">
-        <a className="btn btn-ghost text-xl w-24">
+        <a className="btn btn-ghost text-xl w-28">
           <img
             src={theme === "light" ? raqeebLogoBlack : raqeebLogoWhite}
             alt="raqeeb logo"
@@ -34,7 +34,7 @@ const Navbar = ({ theme, setTheme }: NavbarProps) => {
           {/* this hidden checkbox controls the state */}
           <input
             type="checkbox"
-            className="theme-controller"
+            className="theme-controller hidden"
             value={theme}
             onChange={handleThemeChange}
           />
