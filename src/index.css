@@ -1,0 +1,52 @@
+@import url("https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --secondary-color: #2a303c;
+  --secondary-text: #b2ccd6;
+}
+
+:root:has(input.theme-controller[value="dim"]:checked) .p-datatable-header,
+:root:has(input.theme-controller[value="dim"]:checked) .p-inputtext,
+:root:has(input.theme-controller[value="dim"]:checked) .p-dropdown {
+  background: var(--secondary-color);
+  color: var(--secondary-text);
+}
+
+:root:has(input.theme-controller[value="dim"]:checked) .p-sortable-column-icon {
+  color: greenyellow;
+}
+
+body {
+  font-family: "Poppins", sans-serif;
+}
+
+.p-inputtext {
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--secondary-text);
+  color: var(--secondary-text);
+  width: 100%;
+  padding: 0.5rem 0;
+}
+
+.p-inputtext:focus {
+  outline: none;
+  box-shadow: none;
+}
+
+.p-dropdown-label {
+  border: none;
+  color: #000;
+}
+
+.p-inputwrapper-filled {
+  margin-left: auto;
+}
+
+.p-paginator-first {
+  margin-left: auto;
+}
