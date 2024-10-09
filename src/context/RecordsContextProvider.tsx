@@ -22,6 +22,10 @@ interface RecordsContextType {
   setStatus: (status: string) => void;
   limit: number;
   setLimit: (limit: number) => void;
+  setUsername: (username: string) => void;
+  username: string;
+  leakedSources: number;
+  setLeakedSources: (leakedSources: number) => void;
 }
 
 export const RecordsContext = createContext<RecordsContextType | undefined>(
@@ -53,6 +57,10 @@ const RecordsContextProvider: React.FC<RecordsContextProviderProps> = ({
 
   const [limit, setLimit] = useState<number>(10);
 
+  const [username, setUsername] = useState<string>("");
+
+  const [leakedSources, setLeakedSources] = useState<number>(0);
+
   useEffect(() => {
     localStorage.setItem("theme", theme);
   }, [theme]);
@@ -69,6 +77,10 @@ const RecordsContextProvider: React.FC<RecordsContextProviderProps> = ({
       const res = await axios.get(
         `/api/v0.1/records?page=${page}&limit=${limit}&sortBy=${sortBy}&order=${sortOrder}${
           status ? `&status=${status}` : ""
+        }${username ? `&username=${username}` : ""}${
+          leakedSources && leakedSources > 0
+            ? `&leaked_sources=${leakedSources}`
+            : ""
         }`
       );
 
@@ -90,7 +102,7 @@ const RecordsContextProvider: React.FC<RecordsContextProviderProps> = ({
       const res = await axios.post("/api/v0.1/search", {
         search,
         page,
-        limit: 10,
+        limit,
         // sortBy: "created_at",
         // order: "asc",
         // status: "pending",
@@ -133,6 +145,10 @@ const RecordsContextProvider: React.FC<RecordsContextProviderProps> = ({
         setStatus,
         setLimit,
         limit,
+        setUsername,
+        username,
+        leakedSources,
+        setLeakedSources,
       }}
     >
       {children}

@@ -1,4 +1,7 @@
-import { useEffect } from "react";
+import { FaFilter } from "react-icons/fa6";
+import { TiArrowSortedDown, TiArrowSortedUp } from "react-icons/ti";
+
+import { useEffect, useState } from "react";
 
 import useRecords from "../../hooks/use-records";
 
@@ -18,7 +21,13 @@ const Records = () => {
     setStatus,
     limit,
     setLimit,
+    username,
+    setUsername,
+    leakedSources,
+    setLeakedSources,
   } = useRecords();
+
+  const [isFilterModalOpen, setIsFilterModalOpen] = useState<boolean>(false);
 
   const handleNextPage = () => {
     setPage(page + 1);
@@ -31,7 +40,7 @@ const Records = () => {
 
   useEffect(() => {
     getRecords();
-  }, [page, search, sortOrder, sortBy, status, limit]);
+  }, [page, search, sortOrder, sortBy, status, limit, username, leakedSources]);
 
   const handleUsernameSort = () => {
     setSortBy("username");
@@ -53,6 +62,62 @@ const Records = () => {
 
   return (
     <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
+      {/* Open the modal using document.getElementById('ID').showModal() method */}
+      <button className="btn" onClick={() => setIsFilterModalOpen(true)}>
+        <FaFilter />
+      </button>
+      <dialog
+        id="my_modal_1"
+        className={`modal ${isFilterModalOpen && "modal-open"}`}
+      >
+        <div className="modal-box">
+          <div>
+            <label className="input input-bordered flex items-center gap-2">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 16 16"
+                fill="currentColor"
+                className="h-4 w-4 opacity-70"
+              >
+                <path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6ZM12.735 14c.618 0 1.093-.561.872-1.139a6.002 6.002 0 0 0-11.215 0c-.22.578.254 1.139.872 1.139h9.47Z" />
+              </svg>
+              <input
+                type="text"
+                className="grow border-none focus:shadow-none"
+                placeholder="Username"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+              />
+            </label>
+
+            <label className="form-control w-full ">
+              <div className="label">
+                <span className="label-text">Type Leaked Sources number</span>
+              </div>
+              <input
+                type="number"
+                placeholder="Type here"
+                className="input input-bordered w-full"
+                value={leakedSources}
+                onChange={(e) => setLeakedSources(parseInt(e.target.value))}
+              />
+            </label>
+          </div>
+
+          <div className="modal-action">
+            <form method="dialog">
+              {/* if there is a button in form, it will close the modal */}
+              <button
+                className="btn"
+                onClick={() => setIsFilterModalOpen(false)}
+              >
+                Close
+              </button>
+            </form>
+          </div>
+        </div>
+      </dialog>
+
       {!records.length ? (
         <div className="text-center text-gray-500 dark:text-gray-400">
           No records found
@@ -66,30 +131,47 @@ const Records = () => {
           <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
             <thead className="text-xs uppercase ">
               <tr>
-                <th scope="col" className="px-6 py-3">
+                <th scope="col" className="px-6 py-3 text-nowrap">
                   URL
                 </th>
                 <th
                   scope="col"
-                  className="px-6 py-3 cursor-pointer hover:bg-gray-500 hover:text-white transition-all"
+                  className="px-6 py-3 cursor-pointer hover:bg-gray-500 hover:text-white transition-all text-nowrap flex items-center justify-between gap-5"
                   onClick={handleUsernameSort}
                 >
-                  Username
+                  <p>Username</p>
+                  <div>
+                    {sortOrder === "asc" ? (
+                      <TiArrowSortedUp />
+                    ) : (
+                      <TiArrowSortedDown />
+                    )}
+                  </div>
                 </th>
                 <th scope="col" className="px-6 py-3 text-nowrap">
                   Leaked sources
                 </th>
                 <th
                   scope="col"
-                  className="px-6 py-3 cursor-pointer hover:bg-gray-500 hover:text-white transition-all"
+                  className="px-6 py-3 cursor-pointer hover:bg-gray-500 hover:text-white transition-all text-nowrap flex items-center justify-between gap-5"
                   onClick={handleCreatedAtSort}
                 >
-                  Created At
+                  <p>Created At</p>
+                  <div>
+                    {sortOrder === "asc" ? (
+                      <TiArrowSortedUp />
+                    ) : (
+                      <TiArrowSortedDown />
+                    )}
+                  </div>
                 </th>
-                <th scope="col" className="px-6 py-3">
+                <th scope="col" className="px-6 py-3 text-nowrap">
                   Modified At
                 </th>
-                <th scope="col" className="px-6 py-3 flex items-center  gap-5">
+                <th
+                  scope="col"
+                  className="px-6 py-3 flex items-center  gap-5 text-nowrap"
+                >
                   <div>Status</div>
                   <div className="dropdown">
                     <div

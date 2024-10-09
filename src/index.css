@@ -50,3 +50,7 @@ body {
 .p-paginator-first {
   margin-left: auto;
 }
+
+input:focus {
+  --tw-ring-shadow: 0 !important;
+}
