@@ -1,165 +1,223 @@
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 
-import axios from "../../api/axios";
+import useRecords from "../../hooks/use-records";
 
-interface Record {
-  _id: number;
-  url: string;
-  username: string;
-  leaked_sources: number;
-  created_at: string;
-  modified_at: string;
-  status: string;
-}
+const Records = () => {
+  const {
+    getRecords,
+    page,
+    setPage,
+    records,
+    search,
+    isLoading,
+    sortOrder,
+    sortBy,
+    setSortBy,
+    setSortOrder,
+    status,
+    setStatus,
+    limit,
+    setLimit,
+  } = useRecords();
 
-const Records = ({ theme }: { theme: string }) => {
-  const [page, setPage] = useState<number>(1);
+  const handleNextPage = () => {
+    setPage(page + 1);
+  };
 
-  const [records, setRecords] = useState<Record[]>([]);
-
-  const getRecords = async () => {
-    try {
-      const res = await axios.get(
-        `/api/v0.1/records?page=${page}&limit=10&sortBy=created_at&order=asc`
-      );
-
-      console.log(res);
-
-      setRecords(res.data.data.records);
-    } catch (error) {
-      console.error(error);
-    }
+  const handlePreviousPage = () => {
+    if (page === 1) return;
+    setPage(page - 1);
   };
 
   useEffect(() => {
     getRecords();
-  }, [page]);
+  }, [page, search, sortOrder, sortBy, status, limit]);
+
+  const handleUsernameSort = () => {
+    setSortBy("username");
+    if (sortOrder === "asc") {
+      setSortOrder("desc");
+    } else {
+      setSortOrder("asc");
+    }
+  };
+
+  const handleCreatedAtSort = () => {
+    setSortBy("created_at");
+    if (sortOrder === "asc") {
+      setSortOrder("desc");
+    } else {
+      setSortOrder("asc");
+    }
+  };
 
   return (
     <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
-      <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
-        <thead className="text-xs uppercase ">
-          <tr>
-            <th scope="col" className="px-6 py-3">
-              URL
-            </th>
-            <th scope="col" className="px-6 py-3">
-              Username
-            </th>
-            <th scope="col" className="px-6 py-3">
-              Leaked sources
-            </th>
-            <th scope="col" className="px-6 py-3">
-              Created At
-            </th>
-            <th scope="col" className="px-6 py-3">
-              Modified At
-            </th>
-            <th scope="col" className="px-6 py-3">
-              Status
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          {records.map((record) => {
-            const {
-              _id,
-              created_at,
-              username,
-              leaked_sources,
-              modified_at,
-              status,
-              url,
-            } = record;
-
-            return (
-              <tr className=" border-b " key={_id}>
-                <td className="px-6 py-4">{url}</td>
-                <td className="px-6 py-4">{username}</td>
-                <td className="px-6 py-4">{leaked_sources}</td>
-                <td className="px-6 py-4">{created_at}</td>
-                <td className="px-6 py-4">{modified_at}</td>
-                <td className="px-6 py-4">{status}</td>
+      {!records.length ? (
+        <div className="text-center text-gray-500 dark:text-gray-400">
+          No records found
+        </div>
+      ) : isLoading ? (
+        <div className="flex items-center justify-center">
+          <span className="loading loading-dots loading-lg"></span>
+        </div>
+      ) : (
+        <>
+          <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+            <thead className="text-xs uppercase ">
+              <tr>
+                <th scope="col" className="px-6 py-3">
+                  URL
+                </th>
+                <th
+                  scope="col"
+                  className="px-6 py-3 cursor-pointer hover:bg-gray-500 hover:text-white transition-all"
+                  onClick={handleUsernameSort}
+                >
+                  Username
+                </th>
+                <th scope="col" className="px-6 py-3 text-nowrap">
+                  Leaked sources
+                </th>
+                <th
+                  scope="col"
+                  className="px-6 py-3 cursor-pointer hover:bg-gray-500 hover:text-white transition-all"
+                  onClick={handleCreatedAtSort}
+                >
+                  Created At
+                </th>
+                <th scope="col" className="px-6 py-3">
+                  Modified At
+                </th>
+                <th scope="col" className="px-6 py-3 flex items-center  gap-5">
+                  <div>Status</div>
+                  <div className="dropdown">
+                    <div
+                      tabIndex={0}
+                      role="button"
+                      className="btn m-1 text-nowrap"
+                    >
+                      Choose your status
+                    </div>
+                    <ul
+                      tabIndex={0}
+                      className="dropdown-content menu bg-base-100 rounded-box z-[1] w-52 p-2 shadow"
+                    >
+                      <li onClick={() => setStatus("")}>
+                        <button>all</button>
+                      </li>
+                      <li onClick={() => setStatus("done")}>
+                        <button>done</button>
+                      </li>
+                      <li onClick={() => setStatus("pending")}>
+                        <button>pending</button>
+                      </li>
+                      <li onClick={() => setStatus("in progress")}>
+                        <button>in progress</button>
+                      </li>
+                    </ul>
+                  </div>
+                </th>
               </tr>
-            );
-          })}
-        </tbody>
-      </table>
+            </thead>
+            <tbody>
+              {records.map((record) => {
+                const {
+                  _id,
+                  created_at,
+                  username,
+                  leaked_sources,
+                  modified_at,
+                  status,
+                  url,
+                } = record;
 
-      <nav
-        className="flex items-center flex-column flex-wrap md:flex-row justify-between pt-4"
-        aria-label="Table navigation"
-      >
-        <span className="text-sm font-normal text-gray-500 dark:text-gray-400 mb-4 md:mb-0 block w-full md:inline md:w-auto">
-          Showing{" "}
-          <span className="font-semibold text-gray-900 dark:text-white">
-            1-10
-          </span>{" "}
-          of{" "}
-          <span className="font-semibold text-gray-900 dark:text-white">
-            1000
-          </span>
-        </span>
-        <ul className="inline-flex -space-x-px rtl:space-x-reverse text-sm h-8">
-          <li>
-            <a
-              href="#"
-              className="flex items-center justify-center px-3 h-8 ms-0 leading-tight text-gray-500 bg-white border border-gray-300 rounded-s-lg hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
-            >
-              Previous
-            </a>
-          </li>
-          <li>
-            <a
-              href="#"
-              className="flex items-center justify-center px-3 h-8 leading-tight text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
-            >
-              1
-            </a>
-          </li>
-          <li>
-            <a
-              href="#"
-              className="flex items-center justify-center px-3 h-8 leading-tight text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
-            >
-              2
-            </a>
-          </li>
-          <li>
-            <a
-              href="#"
-              aria-current="page"
-              className="flex items-center justify-center px-3 h-8 text-blue-600 border border-gray-300 bg-blue-50 hover:bg-blue-100 hover:text-blue-700 dark:border-gray-700 dark:bg-gray-700 dark:text-white"
-            >
-              3
-            </a>
-          </li>
-          <li>
-            <a
-              href="#"
-              className="flex items-center justify-center px-3 h-8 leading-tight text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
-            >
-              4
-            </a>
-          </li>
-          <li>
-            <a
-              href="#"
-              className="flex items-center justify-center px-3 h-8 leading-tight text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
-            >
-              5
-            </a>
-          </li>
-          <li>
-            <a
-              href="#"
-              className="flex items-center justify-center px-3 h-8 leading-tight text-gray-500 bg-white border border-gray-300 rounded-e-lg hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
-            >
-              Next
-            </a>
-          </li>
-        </ul>
-      </nav>
+                return (
+                  <tr className=" border-b " key={_id}>
+                    <td className="px-6 py-4">{url}</td>
+                    <td className="px-6 py-4">{username}</td>
+                    <td className="px-6 py-4">{leaked_sources}</td>
+                    <td className="px-6 py-4">
+                      {new Date(created_at).toLocaleDateString()}
+                    </td>
+                    <td className="px-6 py-4">
+                      {new Date(modified_at).toLocaleDateString()}
+                    </td>
+                    <td className="px-6 py-4">
+                      <div
+                        className={`${
+                          status === "done"
+                            ? "bg-green-500"
+                            : status === "pending"
+                            ? "bg-orange-500"
+                            : "bg-blue-500"
+                        } text-white p-2 w-fit text-nowrap rounded-lg`}
+                      >
+                        {status}
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+
+          <nav
+            className="flex items-center flex-column flex-wrap md:flex-row justify-between pt-4"
+            aria-label="Table navigation"
+          >
+            <div className="dropdown">
+              <div tabIndex={0} role="button" className="btn m-1">
+                {limit} rows
+              </div>
+              <ul
+                tabIndex={0}
+                className="dropdown-content menu bg-base-100 rounded-box z-[1] w-52 p-2 shadow"
+              >
+                <li onClick={() => setLimit(10)}>
+                  <button>10</button>
+                </li>
+                <li onClick={() => setLimit(25)}>
+                  <button>25</button>
+                </li>
+                <li onClick={() => setLimit(50)}>
+                  <button>50</button>
+                </li>
+                <li onClick={() => setLimit(100)}>
+                  <button>100</button>
+                </li>
+                <li onClick={() => setLimit(200)}>
+                  <button>200</button>
+                </li>
+              </ul>
+            </div>
+
+            <span className="text-sm text-gray-700 dark:text-gray-400">
+              Page {page}
+            </span>
+
+            <ul className="inline-flex -space-x-px rtl:space-x-reverse text-sm h-8">
+              <li>
+                <button
+                  onClick={handlePreviousPage}
+                  className="flex items-center justify-center px-3 h-8 ms-0 leading-tight  border border-gray-300 rounded-s-lg hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
+                >
+                  Previous
+                </button>
+              </li>
+
+              <li>
+                <button
+                  onClick={handleNextPage}
+                  className="flex items-center justify-center px-3 h-8 leading-tight  border border-gray-300 rounded-e-lg hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
+                >
+                  Next
+                </button>
+              </li>
+            </ul>
+          </nav>
+        </>
+      )}
     </div>
   );
 };

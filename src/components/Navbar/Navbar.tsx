@@ -1,16 +1,27 @@
 import raqeebLogoBlack from "../../assets/images/svgs/raqeeb-logo-black.svg";
 import raqeebLogoWhite from "../../assets/images/svgs/raqeeb-logo-white.svg";
 import profilePhoto from "../../assets/images/svgs/profile-Kittl.svg";
+import useRecords from "../../hooks/use-records";
+import { useEffect } from "react";
 
-interface NavbarProps {
-  theme: string;
-  setTheme: (theme: string) => void;
-}
+const Navbar = () => {
+  const { setTheme, theme, search, setSearch, searchRecords } = useRecords();
 
-const Navbar = ({ theme, setTheme }: NavbarProps) => {
   const handleThemeChange = () => {
-    setTheme(theme === "light" ? "dim" : "light");
+    const newTheme = theme === "light" ? "dim" : "light";
+    setTheme(newTheme);
+    localStorage.setItem("theme", newTheme); // Save to localStorage
   };
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearch(e.target.value);
+  };
+
+  useEffect(() => {
+    if (search) {
+      searchRecords(); // Call your search function whenever `search` state changes
+    }
+  }, [search]); // Dependencies, so it runs on search or page change
 
   return (
     <nav className="navbar justify-between bg-base-100">
@@ -27,6 +38,8 @@ const Navbar = ({ theme, setTheme }: NavbarProps) => {
           type="text"
           placeholder="Search"
           className="input input-bordered w-24 md:w-auto"
+          value={search}
+          onChange={handleSearchChange}
         />
       </div>
       <div className="flex-none gap-2">
