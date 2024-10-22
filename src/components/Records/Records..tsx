@@ -203,9 +203,9 @@ const Records = () => {
               </tr>
             </thead>
             <tbody>
-              {records.map((record) => {
+              {records.map((record, i) => {
                 const {
-                  _id,
+                  // _id,
                   created_at,
                   username,
                   leaked_sources,
@@ -215,7 +215,7 @@ const Records = () => {
                 } = record;
 
                 return (
-                  <tr className=" border-b " key={_id}>
+                  <tr className=" border-b " key={i}>
                     <td className="px-6 py-4">{url}</td>
                     <td className="px-6 py-4">{username}</td>
                     <td className="px-6 py-4">{leaked_sources}</td>

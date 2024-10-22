@@ -75,7 +75,7 @@ const RecordsContextProvider: React.FC<RecordsContextProviderProps> = ({
       setIsLoading(true);
 
       const res = await axios.get(
-        `/api/v0.1/records?page=${page}&limit=${limit}&sortBy=${sortBy}&order=${sortOrder}${
+        `/records?page=${page}&limit=${limit}&sortBy=${sortBy}&order=${sortOrder}${
           status ? `&status=${status}` : ""
         }${username ? `&username=${username}` : ""}${
           leakedSources && leakedSources > 0
@@ -99,7 +99,7 @@ const RecordsContextProvider: React.FC<RecordsContextProviderProps> = ({
     try {
       setIsLoading(true);
 
-      const res = await axios.post("/api/v0.1/search", {
+      const res = await axios.post("/search", {
         search,
         page,
         limit,

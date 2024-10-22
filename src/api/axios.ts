@@ -1,5 +1,5 @@
 import axios from "axios";
 
 export default axios.create({
-  baseURL: "http://176.57.184.164:8087",
+  baseURL: "https://raqeeb-task.abdulmonaim.top/api/v0.1",
 });
