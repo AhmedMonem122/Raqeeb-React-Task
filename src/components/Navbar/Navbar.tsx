@@ -24,7 +24,7 @@ const Navbar = () => {
   }, [search]); // Dependencies, so it runs on search or page change
 
   return (
-    <nav className="navbar justify-between bg-base-100 sticky top-0">
+    <nav className="navbar justify-between bg-base-100 sticky top-0 z-10">
       <div className="">
         <a className="btn btn-ghost text-xl w-28">
           <img
